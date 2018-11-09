@@ -18,9 +18,7 @@ server <- function(input, output,session) {
       addProviderTiles("OpenStreetMap.Mapnik", group = "OpenStreetmap") %>%
       addLayersControl(baseGroups = c("OpenStreetmap"),
                        options = layersControlOptions(collapsed = TRUE, autoZIndex = F)) %>%
-      addMarkers(data = filteredData()) %>%
-      addCircles(~longitude, ~latitude, radius=5, layerId=~hotels,
-                 stroke=FALSE, fillOpacity=0.4, fillColor="red")
+      addMarkers(data = filteredData())
   })
   
   # # A reactive expression that returns the set of zips that are

@@ -26,6 +26,8 @@ rgc <-read.csv("../data/rgc2011.csv",stringsAsFactors=FALSE, sep = ';') # source
 #prepare data ---- # TODO : CREER UNE COLONNE id UNIQUE SI N'EXISTE PAS
 #suppression des colonnes avec des NA
 hotels <- hotels[,apply(hotels, 2, function(x) { sum(!is.na(x)) > 0 })]
+hotels <- nettoie_nom_colonnes(hotels)
+
 hotels$Longitude <- as.numeric(hotels$Longitude)
 hotels$Latitude <- as.numeric(hotels$Latitude)
 hotels$Altitude <- as.numeric(hotels$Altitude)
@@ -49,7 +51,7 @@ hotels <-merge(hotels,rgc[,c("codeInsee","ZMIN")],by.x="Code.inse",by.y="codeIns
 
 hotels$Altitude <- ifelse(is.na(hotels$Altitude),hotels$ZMIN,hotels$Altitude)
 # on supprime les hotels qui n'ont pas d'altitude
-hotels <- hotels[which(!(is.na(hotels$Altitude)) & hotels$Géolocalisation.validée=="1"),]
+hotels <- hotels[which(!(is.na(hotels$Altitude)) & hotels$Geolocalisation.validee=="1"),]
 # on attribue l'altitude moyenne aux hotels qui n'ont pas d'altitude
 #alt_moy <- mean(hotels$Altitude,na.rm=T)
 #completion altitude (à ameliorer !!!)
@@ -60,9 +62,7 @@ hotels <- hotels[which(!(is.na(hotels$Altitude)) & hotels$Géolocalisation.valid
 hotels[which(hotels$Classement.HOT=="" ),"Classement.HOT"] <- "pas de classement"
 
 #simplify data
-hotels <- hotels[,c("id","Nom","Commune","Téléphone","Classement.HOT","Altitude","Longitude","Latitude")]
-
-hotels <- nettoie_nom_colonnes(hotels)
+hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude")]
 
 # transform to SpatialPointDataFrame
 coordinates(hotels) <- ~ Longitude + Latitude
@@ -75,6 +75,7 @@ proj4string(hotels) <- "+init=epsg:4326"
 # points(hotels, col = "red", cex = .01)
 
 liste_classement <- unique(hotels$Classement.HOT)[order(unique(hotels$Classement.HOT))]
+choices = as.list(liste_classement)
 
 # create dataset and base layer ----
 datasets <- list(

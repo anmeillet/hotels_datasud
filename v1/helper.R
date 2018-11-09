@@ -7,7 +7,7 @@ nettoie_nom_colonnes <- function(donnee_brute,code_commune='') {
   
     # recuperation des noms a changer
     nom_col <- names(donnee_brute)
-    nom_col <- tolower(gsub(" ","_",nom_col))
+    #nom_col <- tolower(gsub(" ","_",nom_col))
     nom_col <- gsub("_-_|__| _|_ ","_",nom_col)
     nom_col <- gsub("é|è|ê","e",nom_col)
     nom_col <- gsub("î","i",nom_col)
@@ -16,17 +16,17 @@ nettoie_nom_colonnes <- function(donnee_brute,code_commune='') {
     #remplacer les euros s'il y en a
     donnee_brute <- data.frame(lapply(donnee_brute, function(x) {
       gsub(" €", "", x)
-    }))
+    }), stringsAsFactors = FALSE)
     
     #remplacer les % s'il y en a
     donnee_brute <- data.frame(lapply(donnee_brute, function(x) {
       gsub("%| %", "", x)
-    }))
+    }), stringsAsFactors = FALSE)
     
     #remplacer les , par des points s'il y en a
     donnee_brute <- data.frame(lapply(donnee_brute, function(x) {
       gsub(",", ".", x)
-    }))
+    }), stringsAsFactors = FALSE)
     
     names(donnee_brute)<-nom_col
     
