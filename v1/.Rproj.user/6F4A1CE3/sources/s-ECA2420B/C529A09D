@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1541664142314.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3080679450",
+    "id" : "C529A09D",
+    "lastKnownWriteTime" : 1541775059,
+    "last_content_update" : 1541775059267,
+    "path" : "~/Documents/R/rshiny/hotels_datasud/v1/global.R",
+    "project_path" : "global.R",
+    "properties" : {
+        "cursorPosition" : "66,0",
+        "scrollLine" : "56",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

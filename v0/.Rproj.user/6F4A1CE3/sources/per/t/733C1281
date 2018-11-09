@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1541667157440.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3403774554",
+    "id" : "733C1281",
+    "lastKnownWriteTime" : 1541664040,
+    "last_content_update" : 1541664040,
+    "path" : "~/Documents/R/rshiny/hotels_datasud/v0/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "121,0",
+        "scrollLine" : "107"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

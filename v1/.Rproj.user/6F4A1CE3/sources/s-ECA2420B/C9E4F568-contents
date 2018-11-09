@@ -1,0 +1,62 @@
+# Server logic ----
+server <- function(input, output,session) {
+  
+  df <- datasets[['Hotels']]
+  
+  filteredData <- reactive({
+    df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
+  })
+
+  colorpal <- reactive({
+    colorNumeric(input$colors, quakes$mag)
+  })
+  
+  output$map <- renderLeaflet({
+    print('render map')
+    leaflet() %>% #addTiles() %>% 
+      addProviderTiles("OpenStreetMap.Mapnik", group = "OpenStreetmap") %>%
+      addLayersControl(baseGroups = c("OpenStreetmap"),
+                       options = layersControlOptions(collapsed = TRUE, autoZIndex = F)) %>%
+      addMarkers(data = filteredData())
+  })
+  
+  # Show a popup at the given location
+  showHotelDetails <- function(id, lat, lng) {
+    selectedId <- df[df$id == id,]
+    content <- as.character(tagList(
+      tags$strong(HTML(sprintf("%s, %s",selectedId$Nom, selectedId$Commune
+      ))), tags$br(),
+      sprintf("Median household income: %s", dollar(selectedZip$income * 1000)), tags$br(),
+      sprintf("Percent of adults with BA: %s%%", as.integer(selectedZip$college)), tags$br(),
+      sprintf("Adult population: %s", selectedZip$adultpop)
+    ))
+    leafletProxy("map") %>% addPopups(lng, lat, content, layerId = zipcode)
+  }
+  
+  # When map is clicked, show a popup with city info
+  observe({
+    leafletProxy("map") %>% clearPopups()
+    event <- input$map_shape_click
+    if (is.null(event))
+      return()
+    
+    isolate({
+      showZipcodePopup(event$id, event$lat, event$lng)
+    })
+  })
+  
+  
+  output$barplot1 <- renderPlot({
+    print('barplot')
+    dfFiltered <- df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
+    nbHotelClassement<- aggregate(dfFiltered$id~dfFiltered$Classement.HOT,data = dfFiltered, length)
+    names(nbHotelClassement)<-c("classement","nb")
+    barplot(height = nbHotelClassement$nb, names.arg = nbHotelClassement$classement, las = 2 )
+    
+
+  }
+    
+  )
+  
+  
+}
