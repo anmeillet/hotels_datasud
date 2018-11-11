@@ -18,7 +18,8 @@ server <- function(input, output,session) {
       addProviderTiles("OpenStreetMap.Mapnik", group = "OpenStreetmap") %>%
       addLayersControl(baseGroups = c("OpenStreetmap"),
                        options = layersControlOptions(collapsed = TRUE, autoZIndex = F)) %>%
-      addMarkers(data = filteredData())
+      addMarkers(data = filteredData(),
+                 layerId = )
   })
   
   # # A reactive expression that returns the set of zips that are
@@ -41,7 +42,7 @@ server <- function(input, output,session) {
     content <- as.character(tagList(
       tags$strong(HTML(sprintf("%s, %s",selectedId$Nom, selectedId$Commune
       ))), tags$br(),
-      sprintf("Téléphone: %s", selectedId$telepgone)
+      sprintf("Téléphone: %s", selectedId$Telephone)
     ))
     leafletProxy("map") %>% addPopups(lng, lat, content, layerId = hotels)
   }

@@ -1,9 +1,9 @@
 #Page de visualisation des hotels datasud
 
 #Check if packages used by app are installed, installs those not installed yet----
-#list.of.packages <- c("shiny", "shinydashboard","shinyjs","leaflet","ggvis","dplyr","RColorBrewer","raster","gstat","rgdal","Cairo")
-#new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-#if(length(new.packages)) install.packages(new.packages)
+# list.of.packages <- c("shiny", "shinydashboard","shinyjs","leaflet","ggvis","dplyr","RColorBrewer","raster","gstat","rgdal","Cairo")
+# new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+# if(length(new.packages)) install.packages(new.packages)
 
 # load packages ----
 require(shiny)
@@ -16,10 +16,10 @@ library(RColorBrewer)
 require(raster)
 require(gstat)
 require(rgdal)
-require(Cairo)
-source("helper.r")
-# hotels <- read.csv("data/hotels-region-sud-apidae-reference.csv",stringsAsFactors=FALSE)
-hotels <- read.csv("../data/hotels-region-sud-apidae-reference_nobooking.csv",stringsAsFactors=FALSE) #version sans une des url du site booking.com comprenant des ,
+# require(Cairo)
+source("helper.R")
+hotels <- read.csv("../data/hotels-region-sud-apidae-reference.csv",stringsAsFactors=FALSE)
+# hotels <- read.csv("../data/hotels-region-sud-apidae-reference_nobooking.csv",stringsAsFactors=FALSE) #version sans une des url du site booking.com comprenant des ,
 
 rgc <-read.csv("../data/rgc2011.csv",stringsAsFactors=FALSE, sep = ';') # source : https://public.opendatasoft.com/explore/dataset/rgc2011/table/
 
