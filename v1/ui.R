@@ -11,12 +11,15 @@ ui <- bootstrapPage(
       selectInput(inputId = 'dataset',label = 'Données',
                   choices = as.vector(names(datasets)))
       ,
-      sliderInput(inputId = "Altitude", label = "Altitude",
-                  min = 0, max = 2200, value = c(0, 2200)),
+      uiOutput('quanti'),
+      uiOutput('slider'),
+
+      uiOutput('quali'),
+      uiOutput('checkbox'),
       
       checkboxGroupInput("Classement",
                          label = "Nombre d'étoiles",
-                         choices = as.list(liste_classement), 
+                         choices = as.list(liste_classement),
                          selected = choices[[1]])
       
       # selectInput("colors", "Color Scheme",

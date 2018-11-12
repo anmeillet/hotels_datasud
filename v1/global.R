@@ -54,21 +54,29 @@ hotels[which(hotels$Classement.HOT=="" ),"Classement.HOT"] <- "pas de classement
 
 
 hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude","url")]
+# rajout de faux prix pour tester les filtres quanti (sinon on n'a que l'altitude)
+hotels$Prix <- sample(50:500, size = nrow(hotels), replace = TRUE)
 
-row.names(hotels) <- hotels$id
+# row.names(hotels) <- hotels$id - fait dans le cadre des pop ups, mais ça marche sans.
+
+# creation des listes pour les filtres qualitatifs
+colQuali = names(which(unlist(lapply(hotels, is.character)))) # selectionne les colonnes de type non numerique
+colQualiUnique <- aggregate(values ~ ind, unique(stack(hotels[,colQuali])), length)# selectionne les colonnes de type non numerique
+
+QualiChoicesHotels <- list()
+for (i in colQualiUnique[colQualiUnique$values<15,"ind"]){ # on  selectionne seulement les variables quali ayant moins de 15 valeurs uniques différentes 
+  QualiChoicesHotels[[i]] <- as.list(
+    unique(hotels[,i])[order(unique(hotels[,i]))]
+  ) 
+}
+
+liste_classement <- unique(hotels$Classement.HOT)[order(unique(hotels$Classement.HOT))]
+choices = as.list(liste_classement)
 
 # transform to SpatialPointDataFrame
 coordinates(hotels) <- ~ Longitude + Latitude
 proj4string(hotels) <- "+init=epsg:4326"
 
-# test affichage carte
-# library(rworldmap)
-# newmap <- getMap(resolution = "low")
-# plot(newmap, xlim = c(4, 7), ylim = c(42, 46), asp = 1)
-# points(hotels, col = "red", cex = .01)
-
-liste_classement <- unique(hotels$Classement.HOT)[order(unique(hotels$Classement.HOT))]
-choices = as.list(liste_classement)
 
 # create dataset and base layer ----
 datasets <- list(
@@ -77,4 +85,8 @@ datasets <- list(
 
 baselayers <- list(
   'Hotels'='DarkMatter (CartoDB)'
+)
+
+QualiChoices <- list(
+  'Hotels'=QualiChoicesHotels
 )

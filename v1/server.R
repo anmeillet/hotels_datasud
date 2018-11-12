@@ -3,15 +3,59 @@ server <- function(input, output,session) {
   
   df <- datasets[['Hotels']]
   
-  filteredData <- reactive({
-    df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
+  # makeReactiveBinding('df')
+  # 
+  # observeEvent(input$dataset,{
+  #   print('dataset')
+  #   leafletProxy('map')%>%clearShapes()
+  #   df <<- datasets[[input$dataset]]  
+  #   i.active <<- NULL
+  #   
+  # })
+  
+  # choix des filtres ----
+  # quantitatifs
+  colQuanti <- names(which(unlist(lapply(df@data, is.numeric))))
+  output$quanti <- renderUI(selectInput('quanti',label='Filtre quantitatif',choices = colQuanti,selected =  colQuanti[1]))
+  
+  quanti_ <- reactive({if (is.null (input$quanti)) return(colQuanti[1]) else return(input$quanti)})
+  
+  output$slider <- renderUI({
+    sliderInput("slider", label = quanti_(),
+                min = min(df@data[,quanti_()],na.rm = T),
+                max = max(df@data[,quanti_()],na.rm = T),
+                value = c(
+                  min(df@data[,quanti_()],na.rm = T), 
+                  max(df@data[,quanti_()],na.rm = T))
+    )
   })
+  
+  # qualitatifs
+  output$quali <- renderUI(selectInput('quali',label='Filtre qualitatif',
+                                       choices = names(QualiChoices[[input$dataset]]),
+                                       selected =  names(QualiChoices[[input$dataset]])[1])
+                           )
+  
+  quali_ <- reactive({if (is.null (input$quali)) return(names(QualiChoices[[input$dataset]])[1]) else return(input$quali)})
+  
+  output$checkbox <- renderUI(checkboxGroupInput('checkbox',label=quali_(),
+                                                 choices = QualiChoices[[input$dataset]][quali_()],
+                                                 selected =  QualiChoices[[input$dataset]][quali_()][1]))
+  
+  
+  filteredData <- reactive({
+    df[df@data[,quanti_()] >= input$slider[1] & df@data[,quanti_()] <= input$slider[2] & df$Classement.HOT %in% input$Classement ,]
+  })
+  
+  # filteredData <- reactive({
+  #   df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
+  # })
   
   # colorpal <- reactive({
   #   colorNumeric(input$colors, quakes$mag)
   # })
   
-  # Create the map
+  # Create the map ----
   output$map <- renderLeaflet({
     print('render map')
     leaflet() %>% #addTiles() %>% 
@@ -49,13 +93,13 @@ server <- function(input, output,session) {
   
   output$barplot1 <- renderAmCharts({
     print('barplot')
-    dfFiltered <- df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
-    nbHotelClassement<- aggregate(dfFiltered$id~dfFiltered$Classement.HOT,data = dfFiltered, length)
+    #dfFiltered <- df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
+    nbHotelClassement<- aggregate(id~Classement.HOT,data = filteredData(), length)
     names(nbHotelClassement)<-c("classement","nb")
     
-    amBarplot(x = "classement", y = "nb", data = nbHotelClassement, horiz = TRUE, export = TRUE, exportFormat = 'PNG') 
+    amBarplot(x = "classement", y = "nb", data = nbHotelClassement, horiz = TRUE, export = TRUE, exportFormat = 'PNG')
     
-    #plot_ly(data = nbHotelClassement,x=~nb, y = ~classement, type = 'bar', orientation = 'h')
+    ## plot_ly(data = nbHotelClassement,x=~nb, y = ~classement, type = 'bar', orientation = 'h')
   })
   
   
