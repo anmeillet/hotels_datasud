@@ -9,7 +9,8 @@ ui <- bootstrapPage(
     
     dashboardSidebar(
       selectInput(inputId = 'dataset',label = 'Données',
-                  choices = c('Hotels')),
+                  choices = as.vector(names(datasets)))
+      ,
       sliderInput(inputId = "Altitude", label = "Altitude",
                   min = 0, max = 2200, value = c(0, 2200)),
       
@@ -27,16 +28,22 @@ ui <- bootstrapPage(
     dashboardBody(
       
       fluidRow(
-      box(width = 12,status = 'warning',
-          leafletOutput("map",height = 450)
-      )),
+        column(
+          width=6,
+               box(width = NULL,heigth = 450,status = 'info',
+                   amChartsOutput(outputId = "barplot1")
+               )
+        ),
+        
+        column(
+          width = 6,
+          box(width = NULL,status = 'info',
+              leafletOutput("map",height = 450)
+          )
+        )
+      )
       
-      fluidRow(
-      box(width = 8,status = 'warning',
-          plotOutput("barplot1",height = 450)
-      )
-      )
-
+      
     )
   )
 )

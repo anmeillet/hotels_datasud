@@ -30,6 +30,9 @@ nettoie_nom_colonnes <- function(donnee_brute,code_commune='') {
     
     names(donnee_brute)<-nom_col
     
+    #change url name
+    names(donnee_brute)[grepl("url|web",tolower(names(donnee_brute)))] <- "url"
+    
     # correction code_commune
     if (code_commune != '') {
       donnee_brute[,code_commune] <- ifelse(nchar(donnee_brute[,code_commune])==4,paste0('0',donnee_brute[,code_commune]),donnee_brute[,code_commune])

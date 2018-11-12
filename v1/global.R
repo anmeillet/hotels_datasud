@@ -1,23 +1,16 @@
 #Page de visualisation des hotels datasud
 
 #Check if packages used by app are installed, installs those not installed yet----
-# list.of.packages <- c("shiny", "shinydashboard","shinyjs","leaflet","ggvis","dplyr","RColorBrewer","raster","gstat","rgdal","Cairo")
-# new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-# if(length(new.packages)) install.packages(new.packages)
+list.of.packages <- c("shiny", "shinydashboard","leaflet","ggvis","dplyr","RColorBrewer","gstat","rgdal","rAmCharts")
+unused.packages <-c("raster","Cairo","shinyjs","plotly")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
 
 # load packages ----
-require(shiny)
-require(shinydashboard)
-require(shinyjs)
-require(leaflet)
-require(ggvis)
-require(dplyr)
-library(RColorBrewer)
-require(raster)
-require(gstat)
-require(rgdal)
-# require(Cairo)
+lapply(list.of.packages, require, character.only = T)
 source("helper.R")
+
+# load data ----
 hotels <- read.csv("../data/hotels-region-sud-apidae-reference.csv",stringsAsFactors=FALSE)
 # hotels <- read.csv("../data/hotels-region-sud-apidae-reference_nobooking.csv",stringsAsFactors=FALSE) #version sans une des url du site booking.com comprenant des ,
 
@@ -52,17 +45,17 @@ hotels <-merge(hotels,rgc[,c("codeInsee","ZMIN")],by.x="Code.inse",by.y="codeIns
 hotels$Altitude <- ifelse(is.na(hotels$Altitude),hotels$ZMIN,hotels$Altitude)
 # on supprime les hotels qui n'ont pas d'altitude
 hotels <- hotels[which(!(is.na(hotels$Altitude)) & hotels$Geolocalisation.validee=="1"),]
-# on attribue l'altitude moyenne aux hotels qui n'ont pas d'altitude
-#alt_moy <- mean(hotels$Altitude,na.rm=T)
-#completion altitude (à ameliorer !!!)
-#hotels[which(is.na(hotels$Altitude) & hotels$Géolocalisation.validée=="1"),"Altitude"] <- alt_moy
 
 #table(hotels$Classement.HOT)
 #on attribue un classement aux hotels sans info de classement
 hotels[which(hotels$Classement.HOT=="" ),"Classement.HOT"] <- "pas de classement"
 
-#simplify data
-hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude")]
+#simplify data ----
+
+
+hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude","url")]
+
+row.names(hotels) <- hotels$id
 
 # transform to SpatialPointDataFrame
 coordinates(hotels) <- ~ Longitude + Latitude

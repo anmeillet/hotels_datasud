@@ -6,10 +6,10 @@ server <- function(input, output,session) {
   filteredData <- reactive({
     df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
   })
-
-  colorpal <- reactive({
-    colorNumeric(input$colors, quakes$mag)
-  })
+  
+  # colorpal <- reactive({
+  #   colorNumeric(input$colors, quakes$mag)
+  # })
   
   # Create the map
   output$map <- renderLeaflet({
@@ -19,38 +19,25 @@ server <- function(input, output,session) {
       addLayersControl(baseGroups = c("OpenStreetmap"),
                        options = layersControlOptions(collapsed = TRUE, autoZIndex = F)) %>%
       addMarkers(data = filteredData(),
-                 layerId = )
+                 layerId = ~id)
   })
-  
-  # # A reactive expression that returns the set of zips that are
-  # # in bounds right now
-  # HotelsInBounds <- reactive({
-  #   if (is.null(input$map_bounds))
-  #     return(hoteldata[FALSE,])
-  #   bounds <- input$map_bounds
-  #   latRng <- range(bounds$north, bounds$south)
-  #   lngRng <- range(bounds$east, bounds$west)
-  #   
-  #   subset(hoteldata,
-  #          latitude >= latRng[1] & latitude <= latRng[2] &
-  #            longitude >= lngRng[1] & longitude <= lngRng[2])
-  # })
   
   # Show a popup at the given location
   showHotelDetails <- function(id, lat, lng) {
     selectedId <- df[df$id == id,]
     content <- as.character(tagList(
-      tags$strong(HTML(sprintf("%s, %s",selectedId$Nom, selectedId$Commune
+      tags$strong(HTML(sprintf("%s, %s",a(selectedId$Nom, href = selectedId$url, target="_blank"), selectedId$Commune
       ))), tags$br(),
       sprintf("Téléphone: %s", selectedId$Telephone)
     ))
-    leafletProxy("map") %>% addPopups(lng, lat, content, layerId = hotels)
+    leafletProxy("map") %>% addPopups(lng, lat, content, layerId = id)
   }
   
   # When map is clicked, show a popup with city info
   observe({
-    leafletProxy("map") %>% clearPopups()
-    event <- input$map_shape_click
+    leafletProxy(mapId = "map") %>% 
+      clearPopups()
+    event <- input$map_marker_click
     if (is.null(event))
       return()
     
@@ -60,17 +47,16 @@ server <- function(input, output,session) {
   })
   
   
-  output$barplot1 <- renderPlot({
+  output$barplot1 <- renderAmCharts({
     print('barplot')
     dfFiltered <- df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
     nbHotelClassement<- aggregate(dfFiltered$id~dfFiltered$Classement.HOT,data = dfFiltered, length)
     names(nbHotelClassement)<-c("classement","nb")
-    barplot(height = nbHotelClassement$nb, names.arg = nbHotelClassement$classement, las = 2 )
     
-
-  }
+    amBarplot(x = "classement", y = "nb", data = nbHotelClassement, horiz = TRUE, export = TRUE, exportFormat = 'PNG') 
     
-  )
+    #plot_ly(data = nbHotelClassement,x=~nb, y = ~classement, type = 'bar', orientation = 'h')
+  })
   
   
 }
