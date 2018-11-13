@@ -39,12 +39,17 @@ server <- function(input, output,session) {
   quali_ <- reactive({if (is.null (input$quali)) return(names(QualiChoices[[input$dataset]])[1]) else return(input$quali)})
   
   output$checkbox <- renderUI(checkboxGroupInput('checkbox',label=quali_(),
-                                                 choices = QualiChoices[[input$dataset]][quali_()],
-                                                 selected =  QualiChoices[[input$dataset]][quali_()][1]))
+                                                 choices = QualiChoices[[input$dataset]][[quali_()]],
+                                                 selected =  choices[[1]]))
+  
+  # checkboxGroupInput("Classement",
+  #                    label = "Nombre d'étoiles",
+  #                    choices = as.list(liste_classement),
+  #                    selected = choices[[1]])
   
   
   filteredData <- reactive({
-    df[df@data[,quanti_()] >= input$slider[1] & df@data[,quanti_()] <= input$slider[2] & df$Classement.HOT %in% input$Classement ,]
+    df[df@data[,quanti_()] >= input$slider[1] & df@data[,quanti_()] <= input$slider[2] & df@data[,quali_()] %in% input$checkbox ,]
   })
   
   # filteredData <- reactive({
@@ -94,11 +99,11 @@ server <- function(input, output,session) {
   output$barplot1 <- renderAmCharts({
     print('barplot')
     #dfFiltered <- df[df$Altitude >= input$Altitude[1] & df$Altitude <= input$Altitude[2] & df$Classement.HOT %in% input$Classement ,]
-    nbHotelClassement<- aggregate(id~Classement.HOT,data = filteredData(), length)
-    names(nbHotelClassement)<-c("classement","nb")
-    
-    amBarplot(x = "classement", y = "nb", data = nbHotelClassement, horiz = TRUE, export = TRUE, exportFormat = 'PNG')
-    
+    nbHotelQuali<- aggregate(id~filteredData()@data[,quali_()],data = filteredData(), length)
+    names(nbHotelQuali)<-c("classement","nb")
+
+    amBarplot(x = "classement", y = "nb", data = nbHotelQuali, horiz = TRUE, export = TRUE, exportFormat = 'PNG')
+
     ## plot_ly(data = nbHotelClassement,x=~nb, y = ~classement, type = 'bar', orientation = 'h')
   })
   

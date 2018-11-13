@@ -15,12 +15,7 @@ ui <- bootstrapPage(
       uiOutput('slider'),
 
       uiOutput('quali'),
-      uiOutput('checkbox'),
-      
-      checkboxGroupInput("Classement",
-                         label = "Nombre d'étoiles",
-                         choices = as.list(liste_classement),
-                         selected = choices[[1]])
+      uiOutput('checkbox')
       
       # selectInput("colors", "Color Scheme",
       #             rownames(subset(brewer.pal.info, category %in% c("seq", "div")))

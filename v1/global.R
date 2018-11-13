@@ -50,12 +50,15 @@ hotels <- hotels[which(!(is.na(hotels$Altitude)) & hotels$Geolocalisation.valide
 #on attribue un classement aux hotels sans info de classement
 hotels[which(hotels$Classement.HOT=="" ),"Classement.HOT"] <- "pas de classement"
 
-#simplify data ----
-
-
-hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude","url")]
 # rajout de faux prix pour tester les filtres quanti (sinon on n'a que l'altitude)
 hotels$Prix <- sample(50:500, size = nrow(hotels), replace = TRUE)
+#ajout des départements pour tester les filtres quanti
+hotels <-merge(hotels,rgc[,c("codeInsee","DEP")],by.x="Code.inse",by.y="codeInsee",all.x=T)
+
+#simplify data ----
+hotels <- hotels[,c("id","Nom","Commune","Telephone","Classement.HOT","Altitude","Longitude","Latitude","url","Prix","DEP")]
+
+
 
 # row.names(hotels) <- hotels$id - fait dans le cadre des pop ups, mais ça marche sans.
 
